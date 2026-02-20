@@ -14,8 +14,11 @@ def main(argv: list[str] | None = None) -> None:
     sub = parser.add_subparsers(dest="command")
 
     # --- convert ---
-    p_conv = sub.add_parser("convert", help="Convert Excel metadata to YAML")
-    p_conv.add_argument("excel", help="Path to the .xlsx workbook")
+    p_conv = sub.add_parser("convert", help="Convert CSV metadata to YAML")
+    p_conv.add_argument(
+        "metadata_dir",
+        help="Directory containing tables.csv and columns.csv",
+    )
     p_conv.add_argument(
         "-o", "--output-dir",
         default="output",
@@ -34,7 +37,7 @@ def main(argv: list[str] | None = None) -> None:
     if args.command == "convert":
         from .converter import convert
 
-        written = convert(args.excel, args.output_dir, indent=args.indent)
+        written = convert(args.metadata_dir, args.output_dir, indent=args.indent)
         for p in written:
             print(f"  wrote {p}")
         print(f"Done — {len(written)} file(s) generated.")

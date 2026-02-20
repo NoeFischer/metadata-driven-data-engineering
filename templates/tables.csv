@@ -1,0 +1,3 @@
+pipeline_name,description,source_path,source_format,header,delimiter,target_catalog,target_schema,target_table,write_mode,partition_by,merge_keys
+customers_raw,Ingest raw customer CSV from landing zone,/Volumes/main/landing/raw_data/customers.csv,csv,true,",",main,bronze,customers_raw,append,,
+orders_raw,Ingest raw orders parquet,/Volumes/main/landing/raw_data/orders/,parquet,,,main,bronze,orders_raw,overwrite,order_date,

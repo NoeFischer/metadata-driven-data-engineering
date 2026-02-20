@@ -1,0 +1,11 @@
+pipeline_name,source_name,target_name,data_type,nullable,description,transform
+customers_raw,customer_id,customer_id,long,false,Primary key,
+customers_raw,first_name,first_name,string,false,,
+customers_raw,last_name,last_name,string,false,,
+customers_raw,email,email,string,true,Contact email,
+customers_raw,created_at,created_at,timestamp,true,,
+orders_raw,order_id,order_id,long,false,PK,
+orders_raw,customer_id,customer_id,long,false,FK to customers,
+orders_raw,order_date,order_date,date,false,,
+orders_raw,amount,amount_cents,long,true,Amount in cents,CAST(amount * 100 AS LONG)
+orders_raw,status,status,string,true,,UPPER(status)

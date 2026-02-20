@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "metadata-driven-de"
@@ -9,7 +9,6 @@ description = "Metadata-driven data engineering framework for PySpark / Databric
 requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.0",
-    "openpyxl>=3.1",
     "jsonschema>=4.20",
     "pyyaml>=6.0",
 ]

@@ -1,4 +1,4 @@
-"""Convert Excel metadata workbooks to validated YAML files."""
+"""Convert CSV metadata files to validated YAML files."""
 
 from __future__ import annotations
 
@@ -6,22 +6,22 @@ from pathlib import Path
 
 import yaml
 
-from .excel_reader import read_excel
+from .csv_reader import read_csv
 from .models import IngestionPipeline
 
 
 def convert(
-    excel_path: str | Path,
+    metadata_dir: str | Path,
     output_dir: str | Path,
     *,
     indent: int = 2,
 ) -> list[Path]:
-    """Read an Excel workbook, validate each pipeline, and write YAML files.
+    """Read tables.csv and columns.csv, validate each pipeline, and write YAML files.
 
     Parameters
     ----------
-    excel_path:
-        Path to the ``.xlsx`` workbook.
+    metadata_dir:
+        Directory containing ``tables.csv`` and ``columns.csv``.
     output_dir:
         Directory where YAML files will be written (created if needed).
     indent:
@@ -32,9 +32,10 @@ def convert(
     list[Path]
         Paths of the generated YAML files.
     """
-    raw_pipelines = read_excel(excel_path)
+    metadata_dir = Path(metadata_dir)
+    raw_pipelines = read_csv(metadata_dir / "tables.csv", metadata_dir / "columns.csv")
     if not raw_pipelines:
-        raise ValueError("No pipelines found in the workbook.")
+        raise ValueError("No pipelines found in the CSV files.")
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -52,7 +53,7 @@ def convert(
 
         out_file = output_dir / f"{pipeline.pipeline_name}.yaml"
         out_file.write_text(
-            yaml.dump(pipeline.model_dump(by_alias=True), indent=indent, sort_keys=False),
+            yaml.dump(pipeline.model_dump(mode="json", by_alias=True), indent=indent, sort_keys=False),
             encoding="utf-8",
         )
         written.append(out_file)
@@ -61,7 +62,6 @@ def convert(
         msg = "Validation errors:\n" + "\n".join(errors)
         if not written:
             raise ValueError(msg)
-        # Partial success — print warnings but don't crash
         print(f"WARNING: {len(errors)} pipeline(s) failed validation:\n" + "\n".join(errors))
 
     return written

@@ -1,9 +1,10 @@
-"""Convert Excel metadata workbooks to validated JSON files."""
+"""Convert Excel metadata workbooks to validated YAML files."""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
+
+import yaml
 
 from .excel_reader import read_excel
 from .models import IngestionPipeline
@@ -15,21 +16,21 @@ def convert(
     *,
     indent: int = 2,
 ) -> list[Path]:
-    """Read an Excel workbook, validate each pipeline, and write JSON files.
+    """Read an Excel workbook, validate each pipeline, and write YAML files.
 
     Parameters
     ----------
     excel_path:
         Path to the ``.xlsx`` workbook.
     output_dir:
-        Directory where JSON files will be written (created if needed).
+        Directory where YAML files will be written (created if needed).
     indent:
-        JSON indentation level.
+        YAML indentation level.
 
     Returns
     -------
     list[Path]
-        Paths of the generated JSON files.
+        Paths of the generated YAML files.
     """
     raw_pipelines = read_excel(excel_path)
     if not raw_pipelines:
@@ -49,9 +50,9 @@ def convert(
             errors.append(f"Pipeline '{name}': {exc}")
             continue
 
-        out_file = output_dir / f"{pipeline.pipeline_name}.json"
+        out_file = output_dir / f"{pipeline.pipeline_name}.yaml"
         out_file.write_text(
-            json.dumps(pipeline.model_dump(by_alias=True), indent=indent),
+            yaml.dump(pipeline.model_dump(by_alias=True), indent=indent, sort_keys=False),
             encoding="utf-8",
         )
         written.append(out_file)

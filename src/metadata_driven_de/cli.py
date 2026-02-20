@@ -14,20 +14,20 @@ def main(argv: list[str] | None = None) -> None:
     sub = parser.add_subparsers(dest="command")
 
     # --- convert ---
-    p_conv = sub.add_parser("convert", help="Convert Excel metadata to JSON")
+    p_conv = sub.add_parser("convert", help="Convert Excel metadata to YAML")
     p_conv.add_argument("excel", help="Path to the .xlsx workbook")
     p_conv.add_argument(
         "-o", "--output-dir",
         default="output",
-        help="Directory for generated JSON files (default: output/)",
+        help="Directory for generated YAML files (default: output/)",
     )
     p_conv.add_argument(
-        "--indent", type=int, default=2, help="JSON indent (default: 2)"
+        "--indent", type=int, default=2, help="YAML indent (default: 2)"
     )
 
     # --- validate ---
-    p_val = sub.add_parser("validate", help="Validate existing JSON metadata files")
-    p_val.add_argument("json_files", nargs="+", help="JSON file(s) to validate")
+    p_val = sub.add_parser("validate", help="Validate existing YAML metadata files")
+    p_val.add_argument("yaml_files", nargs="+", help="YAML file(s) to validate")
 
     args = parser.parse_args(argv)
 
@@ -40,20 +40,20 @@ def main(argv: list[str] | None = None) -> None:
         print(f"Done — {len(written)} file(s) generated.")
 
     elif args.command == "validate":
-        import json
+        import yaml
         from .models import IngestionPipeline
 
         ok = 0
-        for fp in args.json_files:
+        for fp in args.yaml_files:
             try:
                 with open(fp) as f:
-                    data = json.load(f)
+                    data = yaml.safe_load(f)
                 IngestionPipeline.model_validate(data)
                 print(f"  OK    {fp}")
                 ok += 1
             except Exception as exc:
                 print(f"  FAIL  {fp}: {exc}")
-        print(f"Validated {ok}/{len(args.json_files)} file(s).")
+        print(f"Validated {ok}/{len(args.yaml_files)} file(s).")
 
     else:
         parser.print_help()

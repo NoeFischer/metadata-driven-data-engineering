@@ -1,6 +1,6 @@
 """Pydantic models for ingestion pipeline metadata.
 
-These mirror the JSON schema in schemas/ingestion_pipeline.schema.json and
+These mirror the YAML schema in schemas/ingestion_pipeline.schema.yaml and
 are the single source of truth for validation at runtime.
 """
 

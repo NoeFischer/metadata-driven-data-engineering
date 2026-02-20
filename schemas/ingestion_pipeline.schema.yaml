@@ -1,0 +1,121 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: ingestion_pipeline.schema.yaml
+title: Ingestion Pipeline Metadata
+description: "Describes a single PySpark ingestion pipeline: source, target, and column mappings."
+type: object
+required:
+  - pipeline_name
+  - source
+  - target
+  - columns
+additionalProperties: false
+properties:
+  pipeline_name:
+    type: string
+    description: Unique identifier for this pipeline
+  description:
+    type: string
+    description: Human-readable description of the pipeline
+    default: ""
+  source:
+    type: object
+    required:
+      - path
+      - format
+    additionalProperties: false
+    properties:
+      path:
+        type: string
+        description: "Volume path in Unity Catalog, e.g. /Volumes/catalog/schema/volume/path"
+      format:
+        type: string
+        enum: [csv, parquet, delta, json, avro, orc, xml]
+        description: File format of the source data
+      header:
+        type: boolean
+        description: Whether the source file has a header row (csv/json)
+        default: true
+      delimiter:
+        type: string
+        description: Delimiter for CSV files
+        default: ","
+      read_options:
+        type: object
+        description: Additional Spark read options as key-value pairs
+        additionalProperties:
+          type: string
+        default: {}
+  target:
+    type: object
+    required:
+      - catalog
+      - schema
+      - table
+    additionalProperties: false
+    properties:
+      catalog:
+        type: string
+        description: Unity Catalog catalog name
+      schema:
+        type: string
+        description: Unity Catalog schema name
+      table:
+        type: string
+        description: Target table name
+      write_mode:
+        type: string
+        enum: [append, overwrite, merge]
+        default: append
+      partition_by:
+        type: array
+        items:
+          type: string
+        description: Columns to partition by
+        default: []
+      merge_keys:
+        type: array
+        items:
+          type: string
+        description: Columns used as merge keys when write_mode is merge
+        default: []
+  columns:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      required:
+        - source_name
+        - target_name
+        - data_type
+      additionalProperties: false
+      properties:
+        source_name:
+          type: string
+          description: Column name in the source data
+        target_name:
+          type: string
+          description: Column name in the target table
+        data_type:
+          type: string
+          enum:
+            - string
+            - integer
+            - long
+            - float
+            - double
+            - boolean
+            - date
+            - timestamp
+            - decimal
+            - binary
+          description: Spark SQL data type
+        nullable:
+          type: boolean
+          default: true
+        description:
+          type: string
+          default: ""
+        transform:
+          type: string
+          description: Optional Spark SQL expression to transform the column
+          default: ""
